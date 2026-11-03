@@ -1,0 +1,26 @@
+# Deployed with Coolify (Docker Compose build pack). Coolify's Traefik terminates HTTPS;
+# password protection is done in the app (BASIC_AUTH_USER / BASIC_AUTH_HASH).
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      DB_PATH: /data/news.db
+      DEEPL_API_KEY: ${DEEPL_API_KEY:?set DEEPL_API_KEY}
+      DEEPL_TARGET: ${DEEPL_TARGET:-EN-GB}
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:?set BASIC_AUTH_USER}
+      BASIC_AUTH_HASH: ${BASIC_AUTH_HASH:?set BASIC_AUTH_HASH}
+      FETCH_INTERVAL_MINUTES: ${FETCH_INTERVAL_MINUTES:-30}
+      RETENTION_DAYS: ${RETENTION_DAYS:-30}
+    volumes:
+      - news-data:/data
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  news-data:

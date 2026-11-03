@@ -7,11 +7,12 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
+from .auth import BasicAuth
 from .config import settings
 from .db import Database
 from .fetcher import text_hash
@@ -49,6 +50,18 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
+
+
+auth = BasicAuth(settings.basic_auth_user, settings.basic_auth_hash) if settings.basic_auth_user and settings.basic_auth_hash else None
+if auth is None:
+    logging.getLogger("auth").warning("BASIC_AUTH_USER/BASIC_AUTH_HASH not set: site is NOT password protected")
+
+
+@app.middleware("http")
+async def require_basic_auth(request: Request, call_next):
+    if auth is None or request.url.path == "/healthz" or auth.check(request.headers.get("authorization")):
+        return await call_next(request)
+    return Response("Authentication required", status_code=401, headers={"WWW-Authenticate": 'Basic realm="Danish News"'})
 
 
 @app.middleware("http")

@@ -28,6 +28,8 @@ class Settings:
     retention_days: int = int(os.getenv("RETENTION_DAYS", "30"))
     request_delay_seconds: float = float(os.getenv("REQUEST_DELAY_SECONDS", "1.0"))
     fetch_on_startup: bool = os.getenv("FETCH_ON_STARTUP", "1") == "1"
+    basic_auth_user: str = os.getenv("BASIC_AUTH_USER", "")
+    basic_auth_hash: str = os.getenv("BASIC_AUTH_HASH", "")
     translate_rate_limit_per_minute: int = int(os.getenv("TRANSLATE_RATE_LIMIT", "120"))
 
 
