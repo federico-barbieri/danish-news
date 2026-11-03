@@ -29,6 +29,7 @@
     }
     const { text_en } = await r.json();
     store(body, text_en);
+    document.dispatchEvent(new Event("usage:refresh"));
     return text_en;
   }
 
