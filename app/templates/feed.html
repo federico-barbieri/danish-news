@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<form class="filters" method="get" action="/">
+  <select name="source" aria-label="Source" onchange="this.form.submit()">
+    <option value="">All sources</option>
+    {% for s in sources %}<option value="{{ s }}" {{ 'selected' if s == cur_source }}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="section" aria-label="Section" onchange="this.form.submit()">
+    <option value="">All sections</option>
+    {% for s in sections %}<option value="{{ s }}" {{ 'selected' if s == cur_section }}>{{ s }}</option>{% endfor %}
+  </select>
+</form>
+{% if not articles %}<p class="muted">No articles yet. The first fetch runs on startup; refresh in a minute.</p>{% endif %}
+<ul class="feed">
+  {% for a in articles %}
+  <li class="{{ 'read' if a.read_at }}">
+    <a href="/article/{{ a.id }}">
+      <span class="meta">{{ a.source_name }}{% if a.section %} · {{ a.section }}{% endif %} · {{ a.published_at | reltime }}</span>
+      <span class="title" lang="da">{{ a.title }}</span>
+      {% if a.teaser %}<span class="teaser" lang="da">{{ a.teaser }}</span>{% endif %}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

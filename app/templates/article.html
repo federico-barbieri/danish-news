@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block content %}
+<article class="reader">
+  <p class="meta">{{ article.source_name }}{% if article.section %} · {{ article.section }}{% endif %} · {{ article.published_at | reltime }}
+    · <a href="{{ article.url }}" rel="noreferrer noopener" target="_blank">original</a></p>
+  <h1 lang="da" class="tr" data-title-id="{{ article.id }}">{{ article.title }}</h1>
+  <p class="tr-en" lang="en" hidden></p>
+  <button id="toggle-all" type="button" aria-pressed="false">Show all translations</button>
+  {% if article.lead_image_url %}<img class="lead" src="{{ article.lead_image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer">{% endif %}
+  {% for p in paragraphs %}
+  <div class="para">
+    <p lang="da" class="tr" data-pid="{{ p.id }}" tabindex="0" role="button" aria-expanded="false">{{ p.text_da }}</p>
+    <p class="tr-en" lang="en" hidden></p>
+  </div>
+  {% endfor %}
+</article>
+{% endblock %}
+{% block scripts %}<script src="/static/reader.js" defer></script>{% endblock %}
